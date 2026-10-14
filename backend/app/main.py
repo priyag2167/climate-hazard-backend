@@ -89,11 +89,13 @@ def create_app(injected_service: AnalysisService | None = None) -> FastAPI:
     app.add_middleware(
         CORSMiddleware,
         allow_origins=allowed_origins(),
+        allow_origin_regex=r"^https:\/\/.*\.vercel\.app$",
         allow_credentials=False,
         allow_methods=["GET", "OPTIONS"],
         allow_headers=["*"],
         expose_headers=["Retry-After"],
     )
+
 
     from fastapi.exceptions import RequestValidationError
     from pydantic import ValidationError

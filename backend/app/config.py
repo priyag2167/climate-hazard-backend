@@ -131,5 +131,10 @@ def latest_complete_year() -> int:
 
 
 def allowed_origins() -> list[str]:
-    raw = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,https://climate-hazard-frontend.vercel.app/")
-    return [item.strip() for item in raw.split(",") if item.strip()]
+    raw = os.getenv(
+        "ALLOWED_ORIGINS",
+        "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,https://climate-hazard-frontend.vercel.app,*",
+    )
+    # Strip whitespace and trailing slashes so CORS origin matching never fails due to trailing '/'
+    return [item.strip().rstrip("/") for item in raw.split(",") if item.strip()]
+
