@@ -1,0 +1,12 @@
+.DS_Store
+.env
+.env.*
+!.env.example
+.venv/
+__pycache__/
+.pytest_cache/
+node_modules/
+dist/
+*.pyc
+# Do not publish the confidential assignment brief.
+*.pdf
