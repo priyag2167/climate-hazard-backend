@@ -12,18 +12,23 @@ import {
 } from "chart.js";
 import type { ChartData, ChartOptions } from "chart.js";
 import { Line } from "react-chartjs-2";
-import type { Annual, Metric, Trend } from "./types";
+import type { Annual, Metric, Trend } from "../../types";
+import { METRIC_NAMES } from "../../utils/constants";
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Tooltip, Legend, Filler);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Tooltip,
+  Legend,
+  Filler
+);
 
-export const metricNames: Record<Metric, string> = {
-  heatwave_days: "Heatwave Days (Annual Total)",
-  event_starts: "Heatwave Event Starts (Frequency)",
-  longest_segment_days: "Longest Heatwave Duration (Days)",
-  peak_excess_c: "Peak Heatwave Excess Above 95th Percentile (°C)",
-};
+export const metricNames = METRIC_NAMES;
 
-interface TrendChartProps {
+export interface TrendChartProps {
   annual: Annual[];
   metric: Metric;
   trend?: Trend;
@@ -36,7 +41,7 @@ export function TrendChart({ annual, metric, trend }: TrendChartProps) {
 
     const datasets: ChartData<"line">["datasets"] = [
       {
-        label: metricNames[metric],
+        label: METRIC_NAMES[metric],
         data: primaryValues,
         borderColor: "#ca5532",
         backgroundColor: "rgba(202, 85, 50, 0.08)",
@@ -130,7 +135,12 @@ export function TrendChart({ annual, metric, trend }: TrendChartProps) {
         grid: { color: "rgba(0, 0, 0, 0.06)" },
         title: {
           display: true,
-          text: metric === "peak_excess_c" ? "°C Above Threshold" : metric === "event_starts" ? "Number of Events" : "Days / Year",
+          text:
+            metric === "peak_excess_c"
+              ? "°C Above Threshold"
+              : metric === "event_starts"
+              ? "Number of Events"
+              : "Days / Year",
           font: { weight: "bold", size: 12 },
         },
       },
@@ -143,7 +153,7 @@ export function TrendChart({ annual, metric, trend }: TrendChartProps) {
         data={data}
         options={options}
         role="img"
-        aria-label={`${metricNames[metric]} over time with trend lines`}
+        aria-label={`${METRIC_NAMES[metric]} over time with trend lines`}
       />
     </div>
   );

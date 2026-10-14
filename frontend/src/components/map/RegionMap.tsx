@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import type { Region } from "./types";
+import type { BoundingBox, Region } from "../../types";
 
 // Fix Leaflet's default icon path in bundlers (Vite/Webpack)
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -11,12 +11,12 @@ L.Icon.Default.mergeOptions({
   shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
 });
 
-interface RegionMapProps {
+export interface RegionMapProps {
   selectedLat: number;
   selectedLon: number;
   regionName: string;
   regions: Region[];
-  boundingBox?: { min_lat: number; max_lat: number; min_lon: number; max_lon: number } | null;
+  boundingBox?: BoundingBox | null;
   onLocationSelect: (lat: number, lon: number, name?: string) => void;
 }
 
@@ -45,10 +45,14 @@ export function RegionMap({
     });
 
     // Elegant CartoDB Positron / OSM tiles for clean climate visualization
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
-      maxZoom: 18,
-    }).addTo(map);
+    L.tileLayer(
+      "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+      {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+        maxZoom: 18,
+      }
+    ).addTo(map);
 
     // Click handler to pick custom point
     map.on("click", (e: L.LeafletMouseEvent) => {
@@ -91,7 +95,11 @@ export function RegionMap({
       title: regionName,
     }).addTo(map);
 
-    marker.bindPopup(`<b>${regionName}</b><br/>Lat: ${selectedLat.toFixed(4)}°, Lon: ${selectedLon.toFixed(4)}°`).openPopup();
+    marker
+      .bindPopup(
+        `<b>${regionName}</b><br/>Lat: ${selectedLat.toFixed(4)}°, Lon: ${selectedLon.toFixed(4)}°`
+      )
+      .openPopup();
 
     marker.on("dragend", () => {
       const pos = marker.getLatLng();
@@ -131,7 +139,9 @@ export function RegionMap({
       <div className="map-header-bar">
         <div className="map-title-info">
           <span className="map-dot"></span>
-          <span><b>Region Map:</b> Click anywhere or drag the marker to analyze custom coordinates</span>
+          <span>
+            <b>Region Map:</b> Click anywhere or drag the marker to analyze custom coordinates
+          </span>
         </div>
         <div className="map-coords-badge">
           {selectedLat.toFixed(3)}°N, {selectedLon.toFixed(3)}°E

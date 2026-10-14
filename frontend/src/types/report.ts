@@ -1,24 +1,6 @@
-export type Region = {
-  id: string;
-  name: string;
-  category?: string;
-  latitude: number;
-  longitude: number;
-  timezone: string;
-  bounding_box?: { min_lat: number; max_lat: number; min_lon: number; max_lon: number };
-};
+import type { Region } from "./region";
 
-export type Hazard = {
-  id: "heatwave" | "heavy_rainfall";
-  name: string;
-  variable: string;
-  units: string;
-  description: string;
-};
-
-export type Metric = "heatwave_days" | "event_starts" | "longest_segment_days" | "peak_excess_c";
-
-export type Annual = {
+export interface Annual {
   year: number;
   coverage: number;
   usable: boolean;
@@ -31,9 +13,9 @@ export type Annual = {
   heatwave_days_rolling_5y: number | null;
   event_starts_rolling_5y: number | null;
   longest_segment_days_rolling_5y: number | null;
-};
+}
 
-export type EventRow = {
+export interface EventRow {
   observed_start: string;
   observed_end: string;
   start_in_range: string;
@@ -43,9 +25,9 @@ export type EventRow = {
   clipped_to_selection: boolean;
   peak_tmax_c: number;
   peak_excess_c: number;
-};
+}
 
-export type Comparison = {
+export interface Comparison {
   available: boolean;
   metric?: string;
   reason?: string;
@@ -56,16 +38,16 @@ export type Comparison = {
   absolute_change?: number;
   percent_change?: number | null;
   percent_note?: string | null;
-};
+}
 
-export type Trend = {
+export interface Trend {
   slope_per_decade: number | null;
   r_squared: number | null;
   n_years: number;
   reason: string | null;
-};
+}
 
-export type MannKendall = {
+export interface MannKendall {
   tau: number | null;
   p_value: number | null;
   z_score: number | null;
@@ -74,34 +56,49 @@ export type MannKendall = {
   significant: boolean;
   n_years: number;
   interpretation: string;
-};
+}
 
-export type Report = {
+export interface QualityMetadata {
+  missing_days: number;
+  excluded_years: number[];
+  annual_min_coverage: number;
+  monthly_min_coverage: number;
+  ingestion_anomalies?: Record<string, number>;
+}
+
+export interface DataSourceMetadata {
+  provider: string;
+  model: string;
+  data_type: string;
+  units: string;
+  timezone: string;
+}
+
+export interface Report {
   hazard: string;
   region: Region;
-  selection: { start_year: number; end_year: number; hazard?: string };
+  selection: {
+    start_year: number;
+    end_year: number;
+    hazard?: string;
+  };
   threshold_c: number;
-  baseline: { start_year: number; end_year: number; coverage: number; valid_days?: number };
+  baseline: {
+    start_year: number;
+    end_year: number;
+    coverage: number;
+    valid_days?: number;
+  };
   annual: Annual[];
   events: EventRow[];
   comparison: Comparison;
   trends: Record<"heatwave_days" | "event_starts" | "longest_segment_days", Trend>;
   mann_kendall: Record<"heatwave_days" | "event_starts" | "longest_segment_days", MannKendall>;
-  quality: {
-    missing_days: number;
-    excluded_years: number[];
-    annual_min_coverage: number;
-    monthly_min_coverage: number;
-    ingestion_anomalies?: Record<string, number>;
-  };
+  quality: QualityMetadata;
   warnings: string[];
-  source: {
-    provider: string;
-    model: string;
-    data_type: string;
-    units: string;
-    timezone: string;
+  source: DataSourceMetadata;
+  cache: {
+    analysis_hit: boolean;
   };
-  cache: { analysis_hit: boolean };
   computed_at: string;
-};
+}
